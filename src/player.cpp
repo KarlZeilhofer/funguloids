@@ -475,6 +475,8 @@ void Player::move(Real delta, InputHandler *input) {
 			yaw(Radian(+5 * delta));
 		else if(input->isKeyDown(OIS::KC_RIGHT) || input->isRMouseDown())
 			yaw(Radian(-5 * delta));
+		else if(input->isKeyDown(OIS::KC_DOWN))
+			mSpeed = mMinSpeed; // reset speed acceleration
 	}
 
 	// Keep moving
