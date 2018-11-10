@@ -16,7 +16,7 @@
   sudo apt install build-essential autoconf ogre-1.9-tools libogre-1.9-dev libois-dev liblua5.1-0-dev 
   ./configure
   make
-  make install
+  sudo make install
 ```
 
 --  
