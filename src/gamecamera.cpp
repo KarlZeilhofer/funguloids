@@ -51,7 +51,7 @@ void GameCamera::followTarget(Real delta, Real speed) {
 	// Zoom
 	if(mCamZoom > 0) {
 		Real d = pos.z - mCamZoom;
-		pos.z -= d * delta * (mZoomIn ? 2.5f : 1.0f);
+		pos.z -= d * delta * (mZoomIn ? 2.5f : 1.0f); // zoom fast in, slowly out
 		if(mZoomIn && pos.z < mCamZoom) {
 			pos.z = mCamZoom;
 			mCamZoom = 0;

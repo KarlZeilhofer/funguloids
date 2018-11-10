@@ -72,9 +72,9 @@ public:
 
 	void setZoomIn(Real zpos) {
 		mCamZoom = zpos;
-		//Vector3 pos = mCamera->getPosition();
-		//pos.z = mCamZ;
-		//mCamera->setPosition(pos);
+		Vector3 pos = mCamera->getPosition();
+		pos.z = mCamZ;
+		mCamera->setPosition(pos);
 		mZoomIn = true;
 	}
 
@@ -84,6 +84,14 @@ public:
 		pos.z = zpos;
 		mCamera->setPosition(pos);
 		mZoomIn = false;
+	}
+	
+	void zoomIn(){
+		setZoomIn(mCamera->getPosition().z - 10);
+	}
+	
+	void zoomOut(){
+		setZoomOut(mCamera->getPosition().z + 10);
 	}
 
 	Camera *getCamera() const { return mCamera; }

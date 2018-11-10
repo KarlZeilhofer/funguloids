@@ -162,7 +162,7 @@ void GameApplication::createScene() {
 	gameApp = this;
 	mGameState = STATE_MENU;
 	mEndGame = false;
-	mPlayer = NULL;
+	mPlayer = nullptr;
 
 	// Special level transition overlay
 	mSpecialLevelTransition = OverlayManager::getSingleton().getByName("SpecialLevelTransition");
@@ -215,7 +215,7 @@ void GameApplication::startNewGame() {
 
 	if(mPlayer) {
 		delete mPlayer;
-		mPlayer = NULL;
+		mPlayer = nullptr;
 	}
 
 

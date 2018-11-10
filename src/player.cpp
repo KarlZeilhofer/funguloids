@@ -41,6 +41,7 @@ Player::Player(const String &name, SceneManager *sceneMgr, const String &mesh, c
 	setAnimSpeed(0.15f);
 	setSpeed(40.0f);
 	mMinSpeed = 40.0f;
+	mNumberOfLifesLeft = 10;
 	setMass(5.0f);
 	setRadius(2.0f);
 	mSpaceDown = true;
@@ -65,6 +66,7 @@ Player::Player(const String &name, SceneManager *sceneMgr, const String &mesh, c
 	mInSpecialLevel = false;
 	mSpecialLevelEffectAlpha = 0;
 	mBallWormGlowAlpha = 0;
+	mIsSpeedBoostPhase = false;
 
 	mBaseSound = NULL;
 	mFlySound = NULL;
@@ -219,6 +221,7 @@ void Player::quit() {
 
 
 // Move the player
+// delta in seconds
 void Player::move(Real delta, InputHandler *input) {
 	// Quit?
 	if(input->isKeyDown(OIS::KC_ESCAPE)) {
@@ -384,8 +387,9 @@ void Player::move(Real delta, InputHandler *input) {
 			mIsCounting = false;
 
 			if(!mGoingToSpecialLevel) {
-				mMinSpeed += 4.0f;
+				//mMinSpeed += 4.0f;
 				mCurrentLevel++;
+				mNumberOfLifesLeft = 10; // charge up again to 10 lifes
 
 				char str[16] = "";
 				sprintf(str, "%02d", mCurrentLevel);
@@ -420,7 +424,7 @@ void Player::move(Real delta, InputHandler *input) {
 
 	// Slowly accelerate
 	if(!mIsOnBase && !mIsDead) {
-		mSpeed += 1 * delta;
+		//mSpeed += 1 * delta;
 
 		// Trail waving
 		mTrailWave += 35 * delta;
@@ -441,6 +445,16 @@ void Player::move(Real delta, InputHandler *input) {
 			String sound = "flight" + StringConverter::toString(2 + rand()%11); 
 			SoundSystem::getSingleton().playSound(sound);
 		}
+		
+		// decrease boosted speed over time
+		if(mIsSpeedBoostPhase){
+			mSpeed = mSpeed - (mSpeed - mBaseSpeed)*1.0f*delta;
+			if(mSpeed < mBaseSpeed*1.5f || mSpeed < 5.0f){ // end of boost
+				// fall back to base speed
+				mIsSpeedBoostPhase = false;
+				mSpeed = mBaseSpeed; 
+			}
+		}
 	}
 	mFlareNode->roll(Radian(0.1f * delta));
 
@@ -452,6 +466,7 @@ void Player::move(Real delta, InputHandler *input) {
 
 				// Launch from the base
 				if(mIsOnBase && !mIsCounting) {
+					mMovingTimer = 0;
 					mIsOnBase = false;
 					mSpeed = mMinSpeed;
 					mFlareNode->setScale(1, 1, 1);
@@ -475,8 +490,33 @@ void Player::move(Real delta, InputHandler *input) {
 			yaw(Radian(+5 * delta));
 		else if(input->isKeyDown(OIS::KC_RIGHT) || input->isRMouseDown())
 			yaw(Radian(-5 * delta));
-		else if(input->isKeyDown(OIS::KC_DOWN))
-			mSpeed = mMinSpeed; // reset speed acceleration
+		
+		if(mMovingTimer > 0.5f && input->isKeyDown(OIS::KC_SPACE) && mSpeed < BoostSpeed){
+			if(!mIsSpeedBoostPhase){
+				mBaseSpeed = mSpeed;
+			}
+			mSpeed = BoostSpeed; // temporary speed boost
+			mIsSpeedBoostPhase = true;
+		}
+		
+		if(input->isKeyDown(OIS::KC_DOWN)){
+			mSpeed -= 1.0f;
+			if(mSpeed < 0.5f){
+				mSpeed = 0.5f;
+			}
+		}
+		else if(input->isKeyDown(OIS::KC_UP))
+			mSpeed += 0.5f;
+		
+		if(input->isKeyDown(OIS::KC_ADD)){ // plus
+			mCamera->zoomIn();
+		}			
+		else if(input->isKeyDown(OIS::KC_MINUS)){  // minus
+			mCamera->zoomOut();
+		}
+		
+	
+
 	}
 
 	// Keep moving
@@ -486,6 +526,7 @@ void Player::move(Real delta, InputHandler *input) {
 			Vector3 dir = getDir();
 			mCurrentSpeed = dir * mSpeed;
 			mCurrentSpeed.z = 0;
+			mMovingTimer += delta;
 		}
 		else {
 			// Move to the base
@@ -659,7 +700,10 @@ bool Player::preCollision(MovingObject *other) {
 		if(mGoingToSpecialLevel) return false;
 
 		// Collision with an asteroid -> player dies
-		die();
+		mNumberOfLifesLeft--;
+		if(mNumberOfLifesLeft == 0){
+			die();
+		}
 	}
 
 	return true;
