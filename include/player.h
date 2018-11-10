@@ -62,6 +62,11 @@ private:
 	bool mChangeLevel;				// Can we change the level?
 	Real mLevelChangeTimeout;		// Level change timeout
 	Real mMinSpeed;					// Minimum speed
+	int mNumberOfLifesLeft;
+	Real mBaseSpeed;				// this is the normal current speed, mSpeed can be temporarily boosted by hitting Space
+	bool mIsSpeedBoostPhase;				// true for the duration of boosted speed
+	static constexpr Real BoostSpeed = 200;  // speed on boost
+	Real mMovingTimer;				// time in seconds since moving in level
 	int mCurrentLevel;				// Current level number
 	bool mGoingToSpecialLevel;		// Is the player going to the special level?
 	bool mInSpecialLevel;			// Is the player in the special level?

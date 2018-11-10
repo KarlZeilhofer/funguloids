@@ -45,7 +45,7 @@ function LevelCreate()
 
 
 	-- Create mushrooms
-	for i = 0,2 do
+	for i = 0,15 do
 		local x, y = GetFreePosition(0, 0, 4);
 		local color = i % 3;
 		CreateMushroom("Mushroom" .. i, color, x, y);

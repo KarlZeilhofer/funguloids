@@ -127,7 +127,7 @@ OgreAppFrameListener::OgreAppFrameListener(OgreApplication *app, RenderWindow *w
 
 
 	// Show debug info?
-	if(GameApplication::mGameConfig->GetValue("graphics", "debug_info", "off") == "on") {
+	if(GameApplication::mGameConfig->GetValue("graphics", "debug_info", "off") == String("on")) {
 		showDebugOverlay(true);
 		mStatsOn = true;
 	}
@@ -142,7 +142,7 @@ void OgreAppFrameListener::windowClosed(RenderWindow *rw) {
 	if(rw == mWindow) {
 		if(mInput) {
 			delete mInput;
-			mInput = 0;
+			mInput = nullptr;
 		}
 	}
 }
